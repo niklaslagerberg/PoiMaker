@@ -1,0 +1,14 @@
+{
+  "name": "PoiMaker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "react-native start"
+  },
+  "dependencies": {
+    "react-native": "^0.16.0",
+    "react-native-camera": "^0.3.8",
+    "react-native-file-transfer": "0.0.3",
+    "react-native-file-upload": "^1.0.4"
+  }
+}
