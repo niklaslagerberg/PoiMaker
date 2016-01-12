@@ -137,13 +137,7 @@ class PoiMapView extends Component{
                <Text>{this.state.error}</Text>
             </View>
          )
-      } /*else if(this.state.showPoi){
-         return(<PoiView
-            imageName={this.state.imageName}
-            description={this.state.description}
-            onClose={this.onDetailsViewClose}
-         />);
-      }*/
+      }
 
       return(
          <View style={{
