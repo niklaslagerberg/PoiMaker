@@ -15,112 +15,48 @@ var {
 
 var FileUpload = require('NativeModules').FileUpload;
 
-
 var Camera = require('react-native-camera');
+
+var AddPoiViewSave = require('./AddPoiViewSave');
 
 class AddPoiView extends Component{
 
    constructor(props){
       super(props);
       this.switchCamera = this.switchCamera.bind(this);
-      this.onBarCodeRead = this.onBarCodeRead.bind(this);
       this.takePicture = this.takePicture.bind(this);
       this.render = this.render.bind(this);
-      this.onSave = this.onSave.bind(this);
 
       this.state = {
          cameraType: Camera.constants.Type.back,
-         position: props.position
+         position: props.position,
+         onAdd: props.onAdd
       }
       console.log(this.state);
    }
 
-   componentDidMount(){
-      console.log("compoment Did mount");
-   }
-
    render() {
-      if(this.state.pic) {
-         return (
-            <View style={styles.pic}>
-            <TouchableHighlight style={styles.back}
-               onPress={this.back.bind(this)}>
-               <Text style={styles.backText}>Back</Text>
-            </TouchableHighlight>
-            <Text style={styles.instructions}>Add a Point of Intrest</Text>
-            <Image style={styles.image} source={{uri: this.state.pic}}>
-            </Image>
-            <TextInput
-               onChangeText={(text)=> this.setState({name: text})}
-               style={styles.input}
-               placeholder="Add a description..." />
-            <TouchableHighlight style={styles.button}
-               onPress={this.onSave.bind(this)}>
-               <Text style={styles.buttonText}>Save...</Text>
-            </TouchableHighlight>
-            </View>
-         )
-      } else {
-         return  (
-            <Camera
-              ref="cam"
-              style={styles.container}
-              onBarCodeRead={this.onBarCodeRead}
-              type={this.state.cameraType}
-              captureTarget={Camera.constants.CaptureTarget.disk}
-            >
+      return  (
+         <Camera
+           ref="cam"
+           style={styles.container}
+           onBarCodeRead={this.onBarCodeRead}
+           type={this.state.cameraType}
+           captureTarget={Camera.constants.CaptureTarget.disk}
+         >
 
-              <TouchableHighlight onPress={this.takePicture}>
-                 <Image
-                source={require('image!capture_inverted_76')}
-                style={{
-                   height: 76,
-                   width: 76,
-                }}
-             />
-              </TouchableHighlight>
-            </Camera>
-         );
-      }
-   }
-   onBarCodeRead(e) {
-      console.log(e);
-   }
-   back() {
+           <TouchableHighlight onPress={this.takePicture}>
+              <Image
+             source={require('image!capture_inverted_76')}
+             style={{
+                height: 76,
+                width: 76,
+             }}
+          />
+           </TouchableHighlight>
+         </Camera>
+      );
 
-   }
-   onSave(data) {
-      var obj = {
-        uploadUrl: Utils.ServerUrl() + "poi/upload/",
-        method: 'POST', // default 'POST',support 'POST' and 'PUT'
-        headers: {
-          'Accept': 'application/json',
-        },
-        fields: {
-            'latitude': this.state.position.coords.latitude,
-            'longitude': this.state.position.coords.longitude,
-            'name': this.state.name
-        },
-        files: [
-          {
-            name: 'image', // optional, if none then `filename` is used instead
-            filename: this.state.pic.substring(this.state.pic.lastIndexOf('/')+1), // require, file name
-            filepath: this.state.pic, // require, file absoluete path
-            filetype: 'image/jpeg', // options, if none, will get mimetype from `filepath` extension
-          },
-        ]
-    };
-    var self = this;
-    FileUpload.upload(obj, function(err, result) {
-      console.log(result);
-      if(result.status >= 200 || result.status < 300) {
-         self.state.pic = undefined;
-         self.props.onAdd();
-      }
-      else if(err) {
-         throw err;
-      }
-    })
    }
 
    switchCamera() {
@@ -134,8 +70,16 @@ class AddPoiView extends Component{
    takePicture() {
       var self = this;
       this.refs.cam.capture(function(err, data) {
-         console.log(data);
-         self.setState({pic: data});
+
+         self.props.navigator.push({
+            title: "",
+            component: AddPoiViewSave,
+            passProps: {
+               pic: data,
+               position: self.state.position,
+               onAdd: self.state.onAdd
+            }
+         });
       });
    }
 }
@@ -158,14 +102,6 @@ var styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'flex-end',
       backgroundColor: 'transparent',
-   },
-   back: {
-
-
-   },
-   backText: {
-      fontSize: 22,
-      color: '#48bbec',
    },
    welcome: {
       fontSize: 20,
@@ -197,9 +133,5 @@ var styles = StyleSheet.create({
       justifyContent: 'center',
    },
 });
-
-
-
-
 
 module.exports = AddPoiView;

@@ -34,7 +34,11 @@ class PoiView extends Component{
       return (
          <View style={styles.container}>
             <Image style={styles.image} source={{uri: Utils.ServerUrl() + this.state.imageName}}>
-               <Text style={styles.description}>{this.state.description}</Text>
+               <View style={styles.imageContainer}>
+                  <Text style={styles.description}>{this.state.description + "  "}
+                     <Image style={styles.rating} source={require('image!rating')}/>
+                  </Text>
+               </View>
             </Image>
          </View>
       );
@@ -42,31 +46,30 @@ class PoiView extends Component{
 }
 
 var styles = StyleSheet.create({
-   pic: {
-      paddingTop: 50,
-      justifyContent: 'center'
-   },
    image: {
+      paddingTop: 80,
       alignSelf: 'center',
-      alignItems: 'center',
       width: 378,
-      height: 667
+      height: 667,
    },
    container: {
       flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'transparent',
+      alignItems: 'center'
    },
-   backText: {
-      fontSize: 22,
-      color: '#48bbec',
+   imageContainer: {
+      alignSelf: 'center',
+      height: 120,
+      width: 320,
+      backgroundColor: 'rgba(0,0,0,0)',
+   },
+   rating: {
+      height: 10
    },
    description: {
-      fontSize: 20,
-      textAlign: 'center',
-      margin: 10,
-      color: '#ababab'
+      alignSelf: 'center',
+      fontSize: 22,
+      fontWeight: "700",
+      color: 'white'
    }
 });
 

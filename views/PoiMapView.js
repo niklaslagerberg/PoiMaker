@@ -65,7 +65,12 @@ class PoiMapView extends Component{
       })
       .then((response) => response.json())
       .then((responseData) => {
-         this.createMarkers(responseData.nearby);
+         console.log("responseData.nearby");
+         console.log(responseData.nearby);
+         this.setState({
+               pois: this.JSONifyName(responseData.nearby)
+            });
+         this.createMarkers();
       })
       .catch((error) => {
          this.setState({
@@ -74,17 +79,29 @@ class PoiMapView extends Component{
          });
       });
    }
+   // As the georedis only permitts a string as key we need to JSONify the name into a object
+   JSONifyName(data) {
 
-   createMarkers(pos_list) {
+      for (var i = 0; i < data.length; i++) {
+         var poi = JSON.parse(data[i].key);
+         data[i].name = poi.name;
+         data[i].description = poi.description;
+         data[i].rating = poi.rating;
+         data[i].image = poi.image;
+      }
+      return data;
+   }
+
+   createMarkers() {
       var markers = [];
 
-      for (var i = 0; i < pos_list.length; i++) {
+      for (var i = 0; i < this.state.pois.length; i++) {
          var marker = {
-            latitude: pos_list[i].latitude,
-            longitude: pos_list[i].longitude,
-            title: pos_list[i].key.substring(pos_list[i].key.lastIndexOf('|')+1),
-            id: pos_list[i].key.substring(0, pos_list[i].key.lastIndexOf('|')),
-            subtitle: 'distance: ' + pos_list[i].distance,
+            latitude: this.state.pois[i].latitude,
+            longitude: this.state.pois[i].longitude,
+            title: this.state.pois[i].name,
+            id: this.state.pois[i].image,
+            subtitle: 'distance: ' + this.state.pois[i].distance,
             tintColor: '#fff'
            }
 
@@ -99,7 +116,7 @@ class PoiMapView extends Component{
    onAnnotationPress(poi){
       console.log(poi);
       this.props.navigator.push({
-         title: poi.title,
+         title: "",
          component: PoiView,
          passProps: {
             imageName: poi.id,
